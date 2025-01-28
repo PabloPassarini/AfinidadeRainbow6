@@ -80,6 +80,7 @@ janela = style.master
 janela.title("Operação Afinidade R6")
 janela.geometry('400x400')
 
+
 # Título
 label_title = Label(janela, text='OPERAÇÃO AFINIDADE R6', font='Arial 14 bold', bootstyle=PRIMARY)
 label_title.grid(row=0, column=0, sticky='NS', pady=10, padx=10)
