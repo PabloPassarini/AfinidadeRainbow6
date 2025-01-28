@@ -1,29 +1,37 @@
 import psutil
 import time
-from tkinter import *
-from tkinter import scrolledtext
+from ttkbootstrap import *
+from ttkbootstrap.constants import *
 
-
-
-
+# Função para adicionar mensagens ao log de maneira controlada
 def append_log(msg):
-    texto_log.config(state='normal')
-    texto_log.insert(END, msg + '\n')
-    texto_log.see(END)
-    texto_log.config(state='disabled')
+    """
+    Adiciona uma mensagem ao log exibido na interface.
+    """
+    texto_log.config(state=NORMAL)  # Permite edição temporária
+    texto_log.insert(END, msg + '\n')  # Insere a mensagem no final
+    texto_log.see(END)  # Rola automaticamente para o final
+    texto_log.config(state=DISABLED)  # Bloqueia a edição novamente
 
+# Função para encontrar o PID de um processo pelo nome
 def find_pid_by_name(process_name):
-    """Retorna o PID do primeiro processo encontrado com o nome especificado."""
+    """
+    Retorna o PID do primeiro processo encontrado com o nome especificado.
+    """
     for proc in psutil.process_iter(['pid', 'name']):
         try:
             if proc.info['name'] == process_name:
                 return proc.info['pid']
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-            pass
+            pass  # Ignora erros ao acessar processos
     return None
 
-
+# Função principal para gerenciar afinidade de CPU
 def set_affinity_one_cpu_by_name(process_name):
+    """
+    Altera a afinidade do processo para usar apenas uma CPU, 
+    e depois restaura a configuração original.
+    """
     append_log('--- AFINIDADE INICIADA ---')
     append_log(f'Processo: {process_name}')
     try:
@@ -58,26 +66,31 @@ def set_affinity_one_cpu_by_name(process_name):
         append_log(f"Ocorreu um erro: {e}")
     append_log('\n')
 
+# Função chamada ao clicar no botão para iniciar a operação
 def start_affinity():
+    """
+    Inicia a alteração de afinidade para processos específicos.
+    """
     set_affinity_one_cpu_by_name('RainbowSix_BE.exe')
     set_affinity_one_cpu_by_name('RainbowSix.exe')
 
-
-
-janela = Tk()
+# Configuração da interface gráfica
+style = Style('darkly')  # Você pode alterar o tema para outros como 'cosmo', 'flatly', 'morph', etc.
+janela = style.master
+janela.title("Operação Afinidade R6")
 janela.geometry('400x400')
 
-Label(janela, text='OPERAÇÃO AFINIDADE R6', font='Arial 12 bold').grid(row=0, column=0, padx=20, pady=20, sticky='NEWS')
+# Título
+label_title = Label(janela, text='OPERAÇÃO AFINIDADE R6', font='Arial 14 bold', bootstyle=PRIMARY)
+label_title.grid(row=0, column=0, sticky='NS', pady=10, padx=10)
 
-btn_afin = Button(janela, text='START', font='Arial 12 bold', bg='green', fg='white', width=37, command=start_affinity)
-btn_afin.grid(row=1, column=0, sticky='NEWS', padx=10)
+# Botão para iniciar a afinidade
+btn_afin = Button(janela, text='START', bootstyle=(SUCCESS, OUTLINE), command=start_affinity, width=59)
+btn_afin.grid(row=1, column=0, sticky='NEWS', pady=10, padx=10)
 
-texto_log = scrolledtext.ScrolledText(janela, width=40,height=15, state=DISABLED)
-texto_log.grid(row=2, column=0, padx=10, pady=10, sticky='NEWS')
+# Caixa de texto para logs
+texto_log = Text(janela, width=50, height=18, state=DISABLED)
+texto_log.grid(row=2, column=0, sticky='NEWS', pady=10, padx=10)
 
-
-
+# Inicia o loop principal da interface
 janela.mainloop()
-
-
-
